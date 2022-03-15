@@ -58,17 +58,17 @@ void moveForward(int n = 1) {
 
     //  If facing east
     case 3: 
-      coords.x += n
+      coords.x += n;
       break;
 
     //  If facing south
     case 2: 
-      coords.y += n
+      coords.y += n;
       break;
 
     //  If facing west
     case 1: 
-      coords.x -= n
+      coords.x -= n;
       break;
 
   }
@@ -93,6 +93,9 @@ void faceDir(int d) {
     digitalWrite(ENA, LOW);
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
+
+    //  Keep rotating based on number of rotations
+    delay(offset * 1000);
     
   }
   else {
@@ -106,6 +109,9 @@ void faceDir(int d) {
     digitalWrite(ENA, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
+
+    //  Keep rotating based on number of rotations
+    delay(offset * 1000);
     
   }
 
@@ -409,6 +415,8 @@ void setup() {
 
 //  Main loop
 void loop() {
+
+  delay(5000);
 
   //  Main loop where we try to discover the whole maze
   while (undiscovered > 0 || (undiscovered == 0 && isSameCoord(coords, startCoords))) {
