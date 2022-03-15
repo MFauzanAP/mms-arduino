@@ -1,8 +1,20 @@
 //  Imports
 #include <cppQueue.h>
 #include <ArduinoQueue.h>
-#include <Robojax_L298N_DC_motor.h>
 #include <Dictionary.h>
+
+//  Motor setup
+#define ENA 0
+#define IN1 1
+#define IN2 2
+#define IN3 3
+#define IN4 4
+#define ENB 5
+
+//  Sensor setup
+int isObstaclePin1 = 6; // This is our input pin
+int isObstaclePin2 = 7; // This is our input pin
+int isObstaclePin3 = 8; // This is our input pin
 
 //  Declare structs
 typedef struct COORDINATE {
@@ -22,27 +34,114 @@ bool explored = false;
 
 //  Function used to move the robot forward
 void moveForward(int n = 1) {
+
+  //  Turn motor 1 clockwise
+  digitalWrite(ENA, LOW);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  //  Turn motor 2 anticlockwise
+  digitalWrite(ENA, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+
+  //  Do this for 1 second
+  delay(1000);
+
+  //  Select direction to update coords
+  switch (dir) {
+
+    //  If facing north
+    case 0: 
+      coords.y -= n;
+      break;
+
+    //  If facing east
+    case 3: 
+      coords.x += n
+      break;
+
+    //  If facing south
+    case 2: 
+      coords.y += n
+      break;
+
+    //  If facing west
+    case 1: 
+      coords.x -= n
+      break;
+
+  }
   
 }
 
 //  Function used to make the robot face a specific direction
-void faceDir(int dir) {
+void faceDir(int d) {
+
+  //  Calculate offset
+  int offset = abs(dir - d);
+
+  //  If going left
+  if (dir - d < 0) {
+
+    //  Make right motor turn clockwise
+    digitalWrite(ENA, LOW);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+
+    //  Make left motor turn clockwise
+    digitalWrite(ENA, LOW);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    
+  }
+  else {
+
+    //  Make right motor turn anticlockwise
+    digitalWrite(ENA, LOW);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+
+    //  Make left motor turn anticlockwise
+    digitalWrite(ENA, LOW);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    
+  }
+
+  //  Set new direction
+  dir = d;
   
 }
 
 //  Function used to check for a wall in front
 bool wallFront() {
-  
+  if (digitalRead(isObstaclePin1) == HIGH) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 //  Function used to check for a wall on the left
 bool wallLeft() {
-  
+  if (digitalRead(isObstaclePin2) == HIGH) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 //  Function used to check for a wall on the right
 bool wallRight() {
-  
+  if (digitalRead(isObstaclePin3) == HIGH) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 //  Function used to pathfind to a specific target
@@ -297,6 +396,15 @@ void generateFloodGrid(cppQueue target) {
 //  Function called on start
 void setup() {
   Serial.begin(19200);
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(isObstaclePin1, INPUT);
+  pinMode(isObstaclePin2, INPUT);
+  pinMode(isObstaclePin3, INPUT);
 }
 
 //  Main loop
